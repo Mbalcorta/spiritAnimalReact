@@ -32,7 +32,9 @@ class App extends Component {
           this.userRef.set(userData)
         })
         this.userRef.on('value', (snapshot) => {
+        
           this.setState({users: snapshot.val()})
+            console.log('Q@@Q@@@@@', snapshot.val())
         })
       }
     })
