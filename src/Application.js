@@ -14,32 +14,31 @@ class App extends Component {
     this.userRef = null;
     this.state = {
       user: null,
-      users: {}
+      users: []
     };
   }
-  
-  componentDidMount() {
-    auth.onAuthStateChanged((user) => {
-      this.setState({ user })
-      this.usersRef = database.ref('users')
-  
-      if(user){
-        this.userRef = this.usersRef.child(user.uid)
-  
-        this.userRef.once('value').then((snapshot) => {
-          if(snapshot.val()) return;
-          const userData = pick(user, ['displayName', 'photoURL', 'email'])
-          this.userRef.set(userData)
-        })
-        this.userRef.on('value', (snapshot) => {
-        
-          this.setState({users: snapshot.val()})
-            console.log('Q@@Q@@@@@', snapshot.val())
-        })
-      }
-    })
-  }
 
+  componentWillMount() {
+    auth.onAuthStateChanged((user) => {
+      this.setState({ user });
+      this.usersRef = database.ref('users');
+
+      if (user) {
+        this.userRef = this.usersRef.child(user.uid);
+
+        this.userRef.once('value').then((snapshot) => {
+          if (snapshot.val()) return;
+          const userInfo = pick(user, ['displayName', 'photoURL', 'email']);
+          this.userRef.set(userInfo);
+        });
+      }
+
+      this.usersRef.on('value', (snapshot) => {
+        // this.setState({ users: snapshot.val() });
+        this.setState({users: this.state.users.concat([snapshot.val()])});
+      });
+    });
+  }
 
   render() {
     const { user, users } = this.state;
@@ -49,14 +48,14 @@ class App extends Component {
         <header className="App--header">
           <h1>Social Animals</h1>
         </header>
-        {console.log('@@@@@@@ ', users)}
         { user
           ? <div>
               <section className="UserProfiles">
                 {
-                  map(users, (profile, uid) => (
-                    <ProfileCard key={uid} {...profile} uid={uid} user={user} />
-                  ))
+                  map(users, (profile, uid) => {
+                    console.log('profile map ', users, profile);
+                    <ProfileCard key={uid[uid]} {...profile[uid]} uid={uid[uid]} user={user[uid]} />
+                  })
                 }
               </section>
               <CurrentUser user={user} />
