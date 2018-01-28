@@ -14,7 +14,7 @@ class App extends Component {
     this.userRef = null;
     this.state = {
       user: null,
-      users: []
+      users: {}
     };
   }
 
@@ -34,8 +34,7 @@ class App extends Component {
       }
 
       this.usersRef.on('value', (snapshot) => {
-        // this.setState({ users: snapshot.val() });
-        this.setState({users: this.state.users.concat([snapshot.val()])});
+        this.setState({users: snapshot.val()});
       });
     });
   }
@@ -52,10 +51,9 @@ class App extends Component {
           ? <div>
               <section className="UserProfiles">
                 {
-                  map(users, (profile, uid) => {
-                    console.log('profile map ', users, profile);
-                    <ProfileCard key={uid[uid]} {...profile[uid]} uid={uid[uid]} user={user[uid]} />
-                  })
+                  map(users, (profile, uid) => (
+                    <ProfileCard key={uid} {...profile} uid={uid} user={user} />
+                    ))
                 }
               </section>
               <CurrentUser user={user} />
